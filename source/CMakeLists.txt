@@ -1,0 +1,25 @@
+add_executable(example example.cpp)
+
+target_link_libraries(example ${FRAMEWORK_NAME} ${BINARY_FILES})
+add_dependencies(example glfw ${FRAMEWORK_NAME} ${COPY_BINARY})
+
+install(TARGETS example DESTINATION .)
+
+add_executable(raytracer raytracer.cpp)
+
+target_link_libraries(raytracer ${FRAMEWORK_NAME} ${BINARY_FILES})
+add_dependencies(raytracer glfw ${FRAMEWORK_NAME} ${COPY_BINARY})
+
+install(TARGETS raytracer DESTINATION .)
+
+#find_package ( UnitTest++ REQUIRED )
+
+add_executable(tests tests.cpp)
+
+target_link_libraries(tests UnitTest++ ${FRAMEWORK_NAME} ${BINARY_FILES})
+add_dependencies(tests UnitTest++ glfw ${FRAMEWORK_NAME} ${COPY_BINARY})
+
+install(TARGETS tests DESTINATION .)
+
+
+
