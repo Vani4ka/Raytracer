@@ -43,59 +43,54 @@ float Box::intersec(Ray const& ra)
 	float divy= 1/ra.direction_.y;
 	float divz= 1/ra.direction_.z;
 
-	float tmin=(p1_.x - ra.origin_.x)*divx;
-	float tmax=(p2_.x - ra.origin_.x)*divx;
-	if (tmin > tmax)
+	float t1x=(p1_.x - ra.origin_.x)*divx;
+	auto px=ra.origin_+t1x*ra.direction_.x;
+	if ( (p1_.x <= px.x) && (p2_.x >= px.x) )
 	{
-		std::swap(tmin, tmax);
+		return t1x;
 	}
 
-	float tymin=(p1_.y - ra.origin_.y)*divy;
-	float tymax=(p2_.y - ra.origin_.y)*divy;
-	if (tymin > tymax)
+	float t2x=(p2_.x - ra.origin_.x)*divx;
+	auto px2=ra.origin_+t2x*ra.direction_.x;
+	if ( (p1_.x >= px2.x) && (p2_.x <= px2.x) )
 	{
-		std::swap(tymin, tymax);
+		return t2x;
+	}
+	//float tmax=(p2_.x - ra.origin_.x)*divx;
+
+	
+
+	float t1y=(p1_.y - ra.origin_.y)*divy;
+	auto py2=ra.origin_+t1y*ra.direction_.y;
+	if ( (p1_.y <= py2.y) && (p2_.y>=py2.y) )
+	{
+		return t1y;
 	}
 
-	if ((tmin > tymax) || (tymin > tmax))
+	float t2y=(p2_.y - ra.origin_.y)*divy;
+	auto py=ra.origin_+t2y*ra.direction_.y;
+	if ( (p1_.y >= py.y) && (p2_.y <= py.y) )
 	{
-		return -1;
+		return t2y;
+	}
+	//float tymax=(p2_.y - ra.origin_.y)*divy;
+	
+
+	float t1z=(p1_.z - ra.origin_.z)*divz;
+	auto pz=ra.origin_+t1z*ra.direction_.z;
+	if ( (p1_.z <= pz.z) && (p2_.z>=pz.z) )
+	{
+		return t1z;
 	}
 
-	if (tymin > tmin)
+	float t2z=(p2_.z - ra.origin_.z)*divz;
+	auto pz2=ra.origin_+t2z*ra.direction_.z;
+	if ( (p1_.z >= pz2.z) && (p2_.z <= pz2.z) )
 	{
-		tmin=tymin;
+		return t2z;
 	}
-
-	if (tymax < tmax)
-	{
-		tmax=tymax;
-	}
-
-	float tzmin=(p1_.z - ra.origin_.z)*divz;
-	float tzmax=(p2_.z - ra.origin_.z)*divz;
-	if (tzmin > tzmax)
-	{
-		std::swap(tzmin, tzmax);
-	}
-
-	if ((tmin > tzmax) || (tzmin > tmax))
-	{
-		return -1;
-	}
-
-	if (tzmin > tmin)
-	{
-		tmin=tzmin;
-	}
-
-	if (tzmax < tmax)
-	{
-		tmax=tzmax;
-	}
-
-	return tmin;
-}
+	//float tzmax=(p2_.z - ra.origin_.z)*divz;
+}	
 
 glm::vec3 Box::normal(glm::vec3 cutpoint)
 {

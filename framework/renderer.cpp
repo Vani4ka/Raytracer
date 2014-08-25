@@ -106,7 +106,7 @@ void Renderer::render()
       write(p);
     }
   }
-  //ppm_.save(filename_);
+  ppm_.save(filename_);
 }
 
 
