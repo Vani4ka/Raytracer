@@ -10,6 +10,7 @@ class Box
 		std::string name_;
 		glm::vec3 p1_;
 		glm::vec3 p2_;
+		glm::vec3 normal_;
 		std::string materialname_;
 	public:
 		Box();

@@ -161,6 +161,34 @@ void sdfloader::load()
 			}
 
 		}
+
+		/*if (temp.find("transform")!= std::string::npos)
+		{
+			if (temp.find("translate")!=std::string::npos)
+			{
+				std::string input[6];
+				size_t pos=0;
+				int i=0;
+				while((pos=temp.find(' ')) != std::string::npos)
+				{
+					input[i]=temp.substr(0,pos);
+					temp.erase(0, pos + 1);
+					++i;
+				}
+
+				std::cout << "reading transformation: " << input[2] << " of " << input[1] << std::endl;
+
+				/*for (i=0; i < sphs_.size(); ++i)
+				{
+					if (sphs_[i].name()==input[1])
+					{
+						glm::vec3 tVector ={std::stof(input[3]), std::stof(input[4]), std::stof(input[5])};
+						sphs_[i].translate(tVector);
+					}
+				}
+			}
+
+		}*/
 		
 		if (temp.find("end")!=std::string::npos)
 		{

@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string>
 #include <stddef.h>
+#include <glm/glm.hpp>
 #include "material.hpp"
 #include "sphere.hpp"
 #include "color.hpp"

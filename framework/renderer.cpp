@@ -90,6 +90,7 @@ void Renderer::render()
 
           if (temp!= -1)
           {
+           
             p.color=raytrace(box, sdf.li().front(), sdf, ray);
           }
           ++iBox;

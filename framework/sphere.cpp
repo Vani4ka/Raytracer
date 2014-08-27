@@ -17,6 +17,10 @@ radius_(radius),
 materialname_(materialname)
 {}
 
+std::string Sphere::name()
+{
+	return name_;
+}
 
 float Sphere::radius()
 {
@@ -78,3 +82,12 @@ glm::vec3 Sphere::normal(glm::vec3 cutpoint)
 {
 	return cutpoint-center_;
 }
+
+/*void Sphere::translate(glm::vec3 const& tvector)
+{
+	auto m = glm::translate(glm::mat4(), tvector);
+	auto m_inv= glm::translate(glm::mat4(), -tvector);
+	transformMatrix_=transformMatrix_ * m;
+	transformMatrix_inv_= transformMatrix_inv_ *m_inv;
+
+}*/
