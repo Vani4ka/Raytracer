@@ -35,7 +35,7 @@ public:
   template<typename T>
   Color raytrace(T const& shape, Light const& light, sdfloader const& sdf, Ray const& r) const&;
   
-  float modulus(glm::vec3 v);
+  float modulus(glm::vec3 v) const;
 
   inline std::vector<Color> const& colorbuffer() const
   {

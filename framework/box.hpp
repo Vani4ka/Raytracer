@@ -17,10 +17,10 @@ class Box
 		Box(std::string name, glm::vec3 p1, glm::vec3 p2, std::string materialname);
 		glm::vec3 p1();
 		glm::vec3 p2();
-		std::string materialname();
-		float intersec(Ray const& ra);
-		glm::vec3 intersectPoint(Ray const& ra);
-		glm::vec3 normal(glm::vec3 cutpoint);
+		std::string materialname() const;
+		float intersec(Ray const& ra) const;
+		glm::vec3 intersectPoint(Ray const& ra) const;
+		glm::vec3 normal(glm::vec3 cutpoint) const;
 
 };
 

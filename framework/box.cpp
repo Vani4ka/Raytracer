@@ -40,17 +40,17 @@ glm::vec3 Box::p2()
 	return p2_;
 }
 
-std::string Box::materialname()
+std::string Box::materialname() const
 {
 	return materialname_;
 }
 
-glm::vec3 Box::intersectPoint(Ray const& ra)
+glm::vec3 Box::intersectPoint(Ray const& ra) const
 {
 	return ra.origin_+intersec(ra)*ra.direction_;
 }
 
-float Box::intersec(Ray const& r)
+float Box::intersec(Ray const& r) const
 {
 	bool hit= false; 
 
@@ -75,7 +75,7 @@ float Box::intersec(Ray const& r)
 		{
 			
 			hit=true;
-			normal_={-1, 0 , 0};
+			normal_=glm::vec3(-1.0f, 0.0f , 0.0f);
 		}
 	}
 
@@ -181,7 +181,7 @@ if(t2>=0){
 	}
 }	
 
-glm::vec3 Box::normal(glm::vec3 cutpoint)
+glm::vec3 Box::normal(glm::vec3 cutpoint) const
 {
 	return normal_;
 }

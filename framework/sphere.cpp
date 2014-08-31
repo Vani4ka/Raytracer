@@ -7,17 +7,35 @@ Sphere::Sphere():
 name_("empty"),
 center_((0.0f,0.0f,0.0f)),
 radius_(0.0f),
-materialname_("empty")
+materialname_("empty"),
+transformMatrix_((0 , 0 , 0 , 0, 
+				 0 , 0 , 0 , 0, 
+				 0 , 0 , 0 , 0,
+				 0 , 0 , 0 , 0)),
+
+transformMatrixInv_((0 , 0 , 0 , 0, 
+				 	 0 , 0 , 0 , 0, 
+					 0 , 0 , 0 , 0,
+				 	 0 , 0 , 0 , 0))
 {}
 
 Sphere::Sphere(std::string name, glm::vec3 center, float radius, std::string materialname):
 name_(name),
 center_(center),
 radius_(radius),
-materialname_(materialname)
+materialname_(materialname),
+transformMatrix_((0 , 0 , 0 , 0, 
+				 0 , 0 , 0 , 0, 
+				 0 , 0 , 0 , 0,
+				 0 , 0 , 0 , 0)),
+
+transformMatrixInv_((0 , 0 , 0 , 0, 
+				 	 0 , 0 , 0 , 0, 
+					 0 , 0 , 0 , 0,
+				 	 0 , 0 , 0 , 0))
 {}
 
-std::string Sphere::name()
+std::string Sphere::name() const
 {
 	return name_;
 }
@@ -32,13 +50,13 @@ glm::vec3 Sphere::center()
 	return center_;
 }
 
-std::string Sphere::materialname()
+std::string Sphere::materialname() const
 {
 	return materialname_;
 }
 
 //pair <bool, Ray>
-float Sphere::intersec(Ray const& ra)
+float Sphere::intersec(Ray const& ra) const
 {
 	auto originDifference = ra.origin_ - center_;
 
@@ -73,12 +91,12 @@ float Sphere::intersec(Ray const& ra)
 	}
 }
 
-glm::vec3 Sphere::intersectPoint(Ray const& ra)
+glm::vec3 Sphere::intersectPoint(Ray const& ra) const
 {
 	return ra.origin_+intersec(ra)*ra.direction_;
 }
 
-glm::vec3 Sphere::normal(glm::vec3 cutpoint)
+glm::vec3 Sphere::normal(glm::vec3 cutpoint) const
 {
 	return cutpoint-center_;
 }

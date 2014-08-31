@@ -17,7 +17,7 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file)
   , ppm_(width_, height_)
 {}
 
-float Renderer::modulus(glm::vec3 v)
+float Renderer::modulus(glm::vec3 v) const
 {
     float asquare=v.x * v.x;
     float bsquare=v.y * v.y;
@@ -55,14 +55,14 @@ void Renderer::render()
       
         while(iSphere != sdf.sphs().end())
         {
-          auto sphere=*iSphere;
+          
           
 
-          temp=sphere.intersec(ray);
+          temp=(*iSphere).intersec(ray);
 
           if (temp!= -1)
           {
-            p.color=raytrace(sphere, sdf.li().front(), sdf, ray);
+            p.color=raytrace(*iSphere, sdf.li().front(), sdf, ray);
           }
           ++iSphere;
         }
@@ -90,7 +90,7 @@ void Renderer::render()
 
           if (temp!= -1)
           {
-           
+
             p.color=raytrace(box, sdf.li().front(), sdf, ray);
           }
           ++iBox;
