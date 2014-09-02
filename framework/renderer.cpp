@@ -66,23 +66,19 @@ void Renderer::render()
           if (temp!= -1)
           {
             //std::cerr<<"Section 4"<<std::endl;
-            p.color=raytrace((*iSphere), sdf.li().front(), sdf, ray);
+            if (sdf.li().empty())
+            {
+              p.color=raytrace((*iSphere), sdf.li().front(), sdf, ray);
+            }
+            else 
+            {
+              if ((x==0)&&(y==0))
+              {  
+                std::cout<<"No light found"<<std::endl;
+              }
+            }
           }
 
-          /*Ray shadow((*iSphere).intersectPoint(ray), glm::normalize(sdf.li().front().position() - (*iSphere).intersectPoint(ray)));
-          
-          for (auto i=iSphere;i != sdf.sphs().end();++i)
-          {
-            temp=(*(++i)).intersec(shadow);
-            --i;
-            auto temp2=(*(++(++i))).intersec(shadow);
-            --i;
-            --i;
-            if ((temp > 0.1) && (temp2 == -1)) 
-            {
-              p.color= p.color * Color(0.3, 0.3, 0.3);
-            }
-          }*/
           ++iSphere;
         }
       }
@@ -152,7 +148,6 @@ Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sd
     {
       if (shape.materialname()==(*i).name())
       {
-        //std::cout<<"found material"<<std::endl;
         Color ambient{0, 0, 0};
         Color diffuse{0, 0, 0};
         Color reflection{0, 0, 0};
@@ -170,7 +165,6 @@ Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sd
         if (diffusefactor > 0) 
         {
           diffuse=light.diffuse()*diffusefactor*(*i).kd();
-          //std::cout<<diffusefactor<<std::endl;
         }
         else 
         {
@@ -189,8 +183,6 @@ Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sd
         auto cosbexpo= std::pow(glm::dot(rnormal, vnormal), (*i).m());
         reflection = light.diffuse() * (*i).ks() * cosbexpo;
 
-        //final= (ambient * ownshadow) + shadowfactor * (diffuse + reflection);
-
 
         Ray shadow(shape.intersectPoint(ray), glm::normalize(light.position() - shape.intersectPoint(ray))); //Schatten
 
@@ -200,7 +192,6 @@ Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sd
         {
           if(vec[j].name() == shape.name())
           {
-            //final= (ambient * ownshadow) + shadowfactor * (diffuse + reflection);
             auto temp=vec[j+1].intersec(shadow);
             
             if (temp != -1) 
@@ -214,9 +205,6 @@ Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sd
             }
           }
         }
-
-
-
 
         return final;
       }

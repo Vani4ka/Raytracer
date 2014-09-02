@@ -15,8 +15,8 @@ class Sphere
 		glm::vec3 center_;
 		float radius_;
 		std::string materialname_;
-		//glm::mat4 transformMatrix_;
-		//glm::mat4 transformMatrixInv_;
+		glm::mat4 transformMatrix_;
+		glm::mat4 transformMatrixInv_;
 
 	public:
 		Sphere();
