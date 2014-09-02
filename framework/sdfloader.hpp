@@ -23,9 +23,9 @@ class sdfloader
 		//map<Shape*> shapes;//abstrakte Klasse Shape
 	public:
 		std::vector<Material> mats() const; 
-		std::vector<Sphere> sphs(); 
-		std::vector<Box> bx();
-		std::vector<Light> li();
+		std::vector<Sphere> sphs() const; 
+		std::vector<Box> bx() const;
+		std::vector<Light> li() const;
 		void load();
 
 		template<typename T>

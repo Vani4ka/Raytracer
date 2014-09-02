@@ -5,17 +5,17 @@ std::vector<Material> sdfloader::mats() const
 	return mats_;
 }
 
-std::vector<Sphere> sdfloader::sphs()
+std::vector<Sphere> sdfloader::sphs() const
 {
 	return sphs_;
 }
 
-std::vector<Box> sdfloader::bx()
+std::vector<Box> sdfloader::bx() const
 {
 	return bx_;
 }
 
-std::vector<Light> sdfloader::li()
+std::vector<Light> sdfloader::li() const
 {
 	return li_;
 }

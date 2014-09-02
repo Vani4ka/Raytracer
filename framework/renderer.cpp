@@ -27,6 +27,7 @@ float Renderer::modulus(glm::vec3 v) const
 
 void Renderer::render()
 {
+  std::cerr<<"Section 1"<<std::endl;
   const std::size_t checkersize = 20;
   sdfloader sdf;
   Camera camera;
@@ -56,14 +57,32 @@ void Renderer::render()
         while(iSphere != sdf.sphs().end())
         {
           
-          
+          //std::cerr<<"Section 2"<<std::endl;
 
           temp=(*iSphere).intersec(ray);
 
+          //std::cerr<<temp<<std::endl;
+
           if (temp!= -1)
           {
-            p.color=raytrace(*iSphere, sdf.li().front(), sdf, ray);
+            //std::cerr<<"Section 4"<<std::endl;
+            p.color=raytrace((*iSphere), sdf.li().front(), sdf, ray);
           }
+
+          /*Ray shadow((*iSphere).intersectPoint(ray), glm::normalize(sdf.li().front().position() - (*iSphere).intersectPoint(ray)));
+          
+          for (auto i=iSphere;i != sdf.sphs().end();++i)
+          {
+            temp=(*(++i)).intersec(shadow);
+            --i;
+            auto temp2=(*(++(++i))).intersec(shadow);
+            --i;
+            --i;
+            if ((temp > 0.1) && (temp2 == -1)) 
+            {
+              p.color= p.color * Color(0.3, 0.3, 0.3);
+            }
+          }*/
           ++iSphere;
         }
       }
@@ -138,10 +157,13 @@ Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sd
         Color diffuse{0, 0, 0};
         Color reflection{0, 0, 0};
         Color shadowfactor{1, 1, 1};
-        Color shadow{1,1,1};
+        Color ownshadow{1,1,1};
+
+        Color final{0, 0, 0};
         
         ambient = (*i).ka() + light.ambient(); //Ambientes Licht
 
+        
         float invmodulus= 1 / (modulus(shape.normal(shape.intersectPoint(ray))) * modulus(-(shape.intersectPoint(ray)-light.position())));   //Diffuses Licht
         float diffusefactor= glm::dot(shape.normal(shape.intersectPoint(ray)), -(shape.intersectPoint(ray) -light.position())) * invmodulus;
 
@@ -153,8 +175,9 @@ Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sd
         else 
         {
           shadowfactor={0, 0, 0};
-          shadow={0.7, 0.7, 0.7};
+          ownshadow={0.3, 0.3, 0.3};
         }
+        
         
         auto n=shape.normal(shape.intersectPoint(ray)); //Spekulares Licht
         auto I= - (shape.intersectPoint(ray) - light.position());
@@ -166,8 +189,36 @@ Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sd
         auto cosbexpo= std::pow(glm::dot(rnormal, vnormal), (*i).m());
         reflection = light.diffuse() * (*i).ks() * cosbexpo;
 
+        //final= (ambient * ownshadow) + shadowfactor * (diffuse + reflection);
 
-        return (ambient * shadow) + shadowfactor * (diffuse + reflection);
+
+        Ray shadow(shape.intersectPoint(ray), glm::normalize(light.position() - shape.intersectPoint(ray))); //Schatten
+
+        auto vec = sdf.sphs();
+        
+        for (int j=0; j != vec.size(); ++j)
+        {
+          if(vec[j].name() == shape.name())
+          {
+            //final= (ambient * ownshadow) + shadowfactor * (diffuse + reflection);
+            auto temp=vec[j+1].intersec(shadow);
+            
+            if (temp != -1) 
+            {
+              final= ambient;
+              final = final * Color(0.3, 0.3, 0.3);
+            }
+            else 
+            {
+              final= (ambient * ownshadow) + shadowfactor * (diffuse + reflection);
+            }
+          }
+        }
+
+
+
+
+        return final;
       }
     }
 }

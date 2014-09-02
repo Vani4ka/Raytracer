@@ -15,6 +15,7 @@ class Box
 	public:
 		Box();
 		Box(std::string name, glm::vec3 p1, glm::vec3 p2, std::string materialname);
+		std::string name() const;
 		glm::vec3 p1();
 		glm::vec3 p2();
 		std::string materialname() const;

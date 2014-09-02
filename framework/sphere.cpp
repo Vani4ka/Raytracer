@@ -7,32 +7,32 @@ Sphere::Sphere():
 name_("empty"),
 center_((0.0f,0.0f,0.0f)),
 radius_(0.0f),
-materialname_("empty"),
+materialname_("empty")/*,
 transformMatrix_((0 , 0 , 0 , 0, 
 				 0 , 0 , 0 , 0, 
 				 0 , 0 , 0 , 0,
-				 0 , 0 , 0 , 0)),
+				 0 , 0 , 0 , 0))
 
 transformMatrixInv_((0 , 0 , 0 , 0, 
 				 	 0 , 0 , 0 , 0, 
 					 0 , 0 , 0 , 0,
-				 	 0 , 0 , 0 , 0))
+				 	 0 , 0 , 0 , 0))*/
 {}
 
 Sphere::Sphere(std::string name, glm::vec3 center, float radius, std::string materialname):
 name_(name),
 center_(center),
 radius_(radius),
-materialname_(materialname),
+materialname_(materialname)/*,
 transformMatrix_((0 , 0 , 0 , 0, 
 				 0 , 0 , 0 , 0, 
 				 0 , 0 , 0 , 0,
-				 0 , 0 , 0 , 0)),
+				 0 , 0 , 0 , 0))
 
 transformMatrixInv_((0 , 0 , 0 , 0, 
 				 	 0 , 0 , 0 , 0, 
 					 0 , 0 , 0 , 0,
-				 	 0 , 0 , 0 , 0))
+				 	 0 , 0 , 0 , 0))*/
 {}
 
 std::string Sphere::name() const

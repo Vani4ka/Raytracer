@@ -30,6 +30,11 @@ materialname_(materialname)
 	// p2=p2-p1;
 }
 
+std::string Box::name() const
+{
+	return name_;
+}
+
 glm::vec3 Box::p1()
 {
 	return p1_;
