@@ -15,8 +15,8 @@ class Sphere
 		glm::vec3 center_;
 		float radius_;
 		std::string materialname_;
-		glm::mat4 transformMatrix_;
-		glm::mat4 transformMatrixInv_;
+		//glm::mat4 transformMatrix_;
+		//glm::mat4 transformMatrixInv_;
 
 	public:
 		Sphere();
@@ -26,7 +26,7 @@ class Sphere
 		glm::vec3 center();
 		std::string materialname() const;
 
-		float intersec(Ray const& ra) const;
+		float intersect(Ray const& ra) const;
 		glm::vec3 intersectPoint(Ray const& ra) const;
 		glm::vec3 normal(glm::vec3 cutpoint) const;
 

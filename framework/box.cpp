@@ -52,10 +52,10 @@ std::string Box::materialname() const
 
 glm::vec3 Box::intersectPoint(Ray const& ra) const
 {
-	return ra.origin_+intersec(ra)*ra.direction_;
+	return ra.origin_+intersect(ra)*ra.direction_;
 }
 
-float Box::intersec(Ray const& r) const
+float Box::intersect(Ray const& r) const
 {
 	bool hit= false; 
 

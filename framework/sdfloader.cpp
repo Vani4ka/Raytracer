@@ -1,23 +1,23 @@
 #include "sdfloader.hpp"
 
-std::vector<Material> sdfloader::mats() const
+std::vector<Material> sdfloader::materials() const
 {
-	return mats_;
+	return materials_;
 }
 
-std::vector<Sphere> sdfloader::sphs() const
+std::vector<Sphere> sdfloader::spheres() const
 {
-	return sphs_;
+	return spheres_;
 }
 
-std::vector<Box> sdfloader::bx() const
+std::vector<Box> sdfloader::boxes() const
 {
-	return bx_;
+	return boxes_;
 }
 
-std::vector<Light> sdfloader::li() const
+std::vector<Light> sdfloader::lights() const
 {
-	return li_;
+	return lights_;
 }
 
 template<typename T>
@@ -26,7 +26,7 @@ std::vector<T> sdfloader::vectorsort(std::vector<T> vec)
 	if (vec.begin() != vec.end())
 	{
 		int j=0;
-		while (j != vec.size()+1)
+		while (j != vec.size())
 		{
 
 			for (int i=0 ; i != vec.size()-1 ; ++i)
@@ -62,11 +62,10 @@ void sdfloader::load()
 	std::string filename("readMat.txt");
 	std::ifstream file(filename);
 	std::string temp;
-	
 	while(file.is_open())
 	{	
-		std::cout << "reading line of file " << filename << std::endl;
 		getline(file, temp);
+		std::cout << "reading line of file " << filename << std::endl; //<<temp <<std::endl;
 		
 		if (temp.find("define material")!=std::string::npos) //Material
 		{
@@ -87,7 +86,11 @@ void sdfloader::load()
 				            {std::stof(input[9]), std::stof(input[10]), std::stof(input[11])},
 				        	std::stof(input[12])};
 			
-			sdfloader::mats_.push_back(mater);
+			materials_.push_back(mater);
+			//std::cout<<mats_[j].name()<<std::endl;
+			std::cout<<"Vector-Size Material: "<<materials_.size()<<std::endl;
+			//++j;
+
 		}
 
 		if (temp.find("define light")!=std::string::npos)
@@ -108,7 +111,9 @@ void sdfloader::load()
 				        {std::stof(input[6]), std::stof(input[7]), std::stof(input[8])},
 				        {std::stof(input[9]), std::stof(input[10]), std::stof(input[11])}};
 			
-			sdfloader::li_.push_back(light); 
+			lights_.push_back(light); 
+
+			std::cout<<"Vector-Size Light: "<<lights_.size()<<std::endl;
 		}
 
 
@@ -134,7 +139,9 @@ void sdfloader::load()
 						std::stof(input[7]),
 						input[8]};
 
-			sdfloader::sphs_.push_back(sp);
+			spheres_.push_back(sp);
+
+			std::cout<<"Vector-Size Spheres: "<<spheres_.size()<<std::endl;
 			}
 
 			if (temp.find("box")!=std::string::npos)
@@ -157,7 +164,7 @@ void sdfloader::load()
 				   {std::stof(input[7]), std::stof(input[8]), std::stof(input[9])},
 					input[10]};
 
-			sdfloader::bx_.push_back(b);
+			boxes_.push_back(b);
 			}
 
 		}
@@ -180,10 +187,10 @@ void sdfloader::load()
 
 				/*for (i=0; i < sphs_.size(); ++i)
 				{
-					if (sphs_[i].name()==input[1])
+					if (spheres_[i].name()==input[1])
 					{
 						glm::vec3 tVector ={std::stof(input[3]), std::stof(input[4]), std::stof(input[5])};
-						sphs_[i].translate(tVector);
+						spheres_[i].translate(tVector);
 					}
 				}
 			}
@@ -198,7 +205,7 @@ void sdfloader::load()
 		
 	}
 
-	sphs_=vectorsort(sphs_);
+	spheres_=vectorsort(spheres_);
 }
 
 

@@ -6,14 +6,14 @@
 #include <iostream>
 #include <unittest++/UnitTest++.h>
 
-SUITE (penis)
+SUITE (test1)
 {
 	TEST(is_drinne_was_drauf_steht)
 	{
 		sdfloader sdf;
 		sdf.load();
 		Material y={"red",{1.0,0.0,0.0},{1.0,0.0,0.0},{1.0,0.0,0.0},1.0};
-		CHECK_EQUAL(sdf.mats().front().m() ,y.m());
+		CHECK_EQUAL(sdf.materials().front().m() ,y.m());
 	}
 
 	/*TEST(is_drinne_was_drauf_steht2)
@@ -24,7 +24,7 @@ SUITE (penis)
 		CHECK_EQUAL(sdf.sphs().front().radius() ,x.radius());
 	}*/
 
-	/*TEST(intersec_und_blah)
+	/*TEST(intersec)
 	{
 		sdfloader sdf;
   		Camera c({0,0,-1}, {0,0,0}, 45);

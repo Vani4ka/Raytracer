@@ -16,16 +16,16 @@
 class sdfloader
 {
 	private:
-		std::vector<Material> mats_;
-		std::vector<Sphere> sphs_;
-		std::vector<Box> bx_;
-		std::vector<Light> li_;
+		std::vector<Material> materials_;
+		std::vector<Sphere> spheres_;
+		std::vector<Box> boxes_;
+		std::vector<Light> lights_;
 		//map<Shape*> shapes;//abstrakte Klasse Shape
 	public:
-		std::vector<Material> mats() const; 
-		std::vector<Sphere> sphs() const; 
-		std::vector<Box> bx() const;
-		std::vector<Light> li() const;
+		std::vector<Material> materials() const; 
+		std::vector<Sphere> spheres() const; 
+		std::vector<Box> boxes() const;
+		std::vector<Light> lights() const;
 		void load();
 
 		template<typename T>

@@ -27,7 +27,7 @@ float Renderer::modulus(glm::vec3 v) const
 
 void Renderer::render()
 {
-  std::cerr<<"Section 1"<<std::endl;
+  //std::cerr<<"Section 1"<<std::endl;
   const std::size_t checkersize = 20;
   sdfloader sdf;
   Camera camera;
@@ -50,25 +50,26 @@ void Renderer::render()
 
       //Sphere
 
-      if (sdf.sphs().begin() != sdf.sphs().end())
+      if (sdf.spheres().begin() != sdf.spheres().end())
       {
-        std::vector<Sphere>::iterator iSphere=sdf.sphs().begin();
+        std::vector<Sphere>::iterator iSphere=sdf.spheres().begin();
       
-        while(iSphere != sdf.sphs().end())
+        while(iSphere != sdf.spheres().end())
         {
           
           //std::cerr<<"Section 2"<<std::endl;
 
-          temp=(*iSphere).intersec(ray);
+          temp=(*iSphere).intersect(ray);
 
-          //std::cerr<<temp<<std::endl;
+          //std::cerr<<"Section 3"<<std::endl;
 
           if (temp!= -1)
           {
-            //std::cerr<<"Section 4"<<std::endl;
-            if (sdf.li().empty())
+            if (!sdf.lights().empty())
             {
-              p.color=raytrace((*iSphere), sdf.li().front(), sdf, ray);
+             // std::cerr<<"Renderer 4"<<std::endl;
+              p.color=raytrace((*iSphere), sdf.lights().front(), sdf, ray);
+              //std::cerr<<"Renderer 5"<<std::endl;
             }
             else 
             {
@@ -78,8 +79,9 @@ void Renderer::render()
               }
             }
           }
-
-          ++iSphere;
+          //std::cerr<<"Section 5"<<std::endl;
+          iSphere++;
+          //std::cerr<<"Section 6"<<std::endl;
         }
       }
       else
@@ -92,21 +94,21 @@ void Renderer::render()
 
       //Box
       
-      if (sdf.bx().begin() != sdf.bx().end())
+     /* if (sdf.bx().begin() != sdf.boxes().end())
       {
-        std::vector<Box>::iterator iBox=sdf.bx().begin();
+        std::vector<Box>::iterator iBox=sdf.boxes().begin();
       
-        while(iBox != sdf.bx().end())
+        while(iBox != sdf.boxes().end())
         {
           auto box=*iBox;
           
 
-          temp=box.intersec(ray);
+          temp=box.intersect(ray);
 
           if (temp!= -1)
           {
 
-            p.color=raytrace(box, sdf.li().front(), sdf, ray);
+            p.color=raytrace(box, sdf.lights().front(), sdf, ray);
           }
           ++iBox;
         }
@@ -117,7 +119,7 @@ void Renderer::render()
         {
           std::cout << "<Box> is empty" << std::endl;
         }
-      }  
+      }*/  
       
       write(p);
     }
@@ -144,21 +146,25 @@ void Renderer::write(Pixel const& p)
 template <typename T>
 Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sdf, Ray const& ray) const&
 {
-    for (std::vector<Material>::iterator i=sdf.mats().begin(); i!=sdf.mats().end(); ++i)
-    {
+    Color final{0, 0, 0};
+    //std::cerr<<"Raytrace 1"<<std::endl;
+    for (auto i=sdf.materials().begin(); i!=sdf.materials().end(); ++i)
+    { 
+      /*std::cerr<<"Shape: "<<shape.name()<<std::endl;
+      std::cerr<<"Mat-Name: "<<shape.materialname()<<std::endl;
+      std::cerr<<"iter-name: "<<(*i).name()<<std::endl;
+      std::cerr<<"Raytrace 2"<<std::endl;*/
       if (shape.materialname()==(*i).name())
       {
+        //std::cerr<<"Raytrace 3"<<std::endl;
         Color ambient{0, 0, 0};
         Color diffuse{0, 0, 0};
         Color reflection{0, 0, 0};
         Color shadowfactor{1, 1, 1};
         Color ownshadow{1,1,1};
-
-        Color final{0, 0, 0};
         
         ambient = (*i).ka() + light.ambient(); //Ambientes Licht
-
-        
+      
         float invmodulus= 1 / (modulus(shape.normal(shape.intersectPoint(ray))) * modulus(-(shape.intersectPoint(ray)-light.position())));   //Diffuses Licht
         float diffusefactor= glm::dot(shape.normal(shape.intersectPoint(ray)), -(shape.intersectPoint(ray) -light.position())) * invmodulus;
 
@@ -186,14 +192,15 @@ Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sd
 
         Ray shadow(shape.intersectPoint(ray), glm::normalize(light.position() - shape.intersectPoint(ray))); //Schatten
 
-        auto vec = sdf.sphs();
+        auto vec = sdf.spheres();
         
         for (int j=0; j != vec.size(); ++j)
         {
           if(vec[j].name() == shape.name())
           {
-            auto temp=vec[j+1].intersec(shadow);
+            auto temp=vec[j+1].intersect(shadow);
             
+            //std::cout<<temp<<std::endl;
             if (temp != -1) 
             {
               final= ambient;
@@ -205,8 +212,11 @@ Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sd
             }
           }
         }
-
-        return final;
+      }
+      else 
+      {
+        //std::cout<<"cant find Material "<<std::endl;
       }
     }
+  return final;
 }

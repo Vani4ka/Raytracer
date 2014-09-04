@@ -56,9 +56,12 @@ std::string Sphere::materialname() const
 }
 
 //pair <bool, Ray>
-float Sphere::intersec(Ray const& ra) const
+float Sphere::intersect(Ray const& ra) const
 {
 	auto originDifference = ra.origin_ - center_;
+
+	float a2Inv = 0;
+	float discSqrt = 0;
 
 	float a = glm::dot(ra.direction_, ra.direction_);
 	float b = 2.0f * glm::dot(ra.direction_, originDifference);
@@ -69,9 +72,19 @@ float Sphere::intersec(Ray const& ra) const
 	if (discriminant < 0) {
 		return -1;
 	}
-
-	float discSqrt = std::sqrt(discriminant);
-	float a2Inv = 1 / (2.0f * a);
+	else 
+	{
+		discSqrt = std::sqrt(discriminant);
+	}
+	
+	if (a!=0)
+	{
+		a2Inv = 1 / (2.0f * a);
+	}
+	else 
+	{
+		std::cout<<"Error"<<std::endl;
+	}
 
 	float t1 = (-b + discSqrt) * a2Inv;
 	float t2 = (-b - discSqrt) * a2Inv;
@@ -93,7 +106,7 @@ float Sphere::intersec(Ray const& ra) const
 
 glm::vec3 Sphere::intersectPoint(Ray const& ra) const
 {
-	return ra.origin_+intersec(ra)*ra.direction_;
+	return ra.origin_+intersect(ra)*ra.direction_;
 }
 
 glm::vec3 Sphere::normal(glm::vec3 cutpoint) const
