@@ -1,43 +1,23 @@
 #include "sphere.hpp"
-#include <glm/glm.hpp>
-#include <math.h>
-#include <iostream>
+
 
 Sphere::Sphere():
-name_("empty"),
 center_((0.0f,0.0f,0.0f)),
-radius_(0.0f),
-materialname_("empty")/*,
-transformMatrix_((0 , 0 , 0 , 0, 
-				 0 , 0 , 0 , 0, 
-				 0 , 0 , 0 , 0,
-				 0 , 0 , 0 , 0))
-
-transformMatrixInv_((0 , 0 , 0 , 0, 
-				 	 0 , 0 , 0 , 0, 
-					 0 , 0 , 0 , 0,
-				 	 0 , 0 , 0 , 0))*/
+radius_(0.0f)
 {}
 
-Sphere::Sphere(std::string name, glm::vec3 center, float radius, std::string materialname):
-name_(name),
+Sphere::Sphere(glm::vec3 center, float radius):
 center_(center),
-radius_(radius),
-materialname_(materialname)/*,
-transformMatrix_((0 , 0 , 0 , 0, 
-				 0 , 0 , 0 , 0, 
-				 0 , 0 , 0 , 0,
-				 0 , 0 , 0 , 0))
-
-transformMatrixInv_((0 , 0 , 0 , 0, 
-				 	 0 , 0 , 0 , 0, 
-					 0 , 0 , 0 , 0,
-				 	 0 , 0 , 0 , 0))*/
+radius_(radius)
 {}
 
-std::string Sphere::name() const
+Sphere::Sphere(std::string name, std::string materialname, glm::vec3 center, float radius):
+center_(center),
+radius_(radius)
+//name_(name),
+//materialname_(materialname)
 {
-	return name_;
+	Shape(name, materialname);
 }
 
 float Sphere::radius()
@@ -50,14 +30,9 @@ glm::vec3 Sphere::center()
 	return center_;
 }
 
-std::string Sphere::materialname() const
+Hit Sphere::intersect(Ray const& ra) const
 {
-	return materialname_;
-}
-
-//pair <bool, Ray>
-float Sphere::intersect(Ray const& ra) const
-{
+	Hit h;
 	auto originDifference = ra.origin_ - center_;
 
 	float a2Inv = 0;
@@ -70,7 +45,9 @@ float Sphere::intersect(Ray const& ra) const
 	float discriminant = b*b - 4.0f*c*a;
 
 	if (discriminant < 0) {
-		return -1;
+		h.hit=false;
+		h.t= -1;
+		return h;
 	}
 	else 
 	{
@@ -94,19 +71,26 @@ float Sphere::intersect(Ray const& ra) const
 	}
 
 	if (t2 < 0) {
-		return -1;
+		h.hit=false;
+		h.t= -1;
+		return h;
 	}
 
 	if (t1 < 0) {
-		return t2;
+		h.hit=true;
+		h.t= t2;
+		return h;
 	} else {
-		return t1;
+		h.hit=true;
+		h.t= t1;
+		return h;
 	}
 }
 
 glm::vec3 Sphere::intersectPoint(Ray const& ra) const
 {
-	return ra.origin_+intersect(ra)*ra.direction_;
+	auto h= intersect(ra);
+	return ra.origin_+h.t*ra.direction_;
 }
 
 glm::vec3 Sphere::normal(glm::vec3 cutpoint) const

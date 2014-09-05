@@ -2,35 +2,38 @@
 #define SPHERE_HPP
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
-#include "glm/gtx/transform.hpp"
-#include <glm/gtc/matrix_transform.hpp>
-#include "ray.hpp"
+#include <math.h>
+#include <iostream>
 #include <string>
+#include "ray.hpp"
+#include "shape.hpp"
+#include "hit.hpp"
 
-class Sphere
+
+class Sphere : Shape
 {
 	private:
-		std::string name_; 
 		glm::vec3 center_;
 		float radius_;
-		std::string materialname_;
-		//glm::mat4 transformMatrix_;
-		//glm::mat4 transformMatrixInv_;
 
 	public:
 		Sphere();
-		Sphere(std::string name, glm::vec3 center, float radius, std::string materialname);
-		std::string name() const;
+		//Sphere(Sphere const& ) = default;
+		//Sphere(Sphere&&) = default;
+		//~Sphere() = default;
+		//Sphere& operator=(Sphere const& other) = default;
+		Sphere(glm::vec3 center, float radius);
+		Sphere(std::string name, std::string materialname, glm::vec3 center, float radius);
+		
+
 		float radius();
 		glm::vec3 center();
-		std::string materialname() const;
 
-		float intersect(Ray const& ra) const;
-		glm::vec3 intersectPoint(Ray const& ra) const;
+		Hit intersect(Ray const& ra) const;
+		glm::vec3 Sphere::intersectPoint(Ray const& ra) const;
 		glm::vec3 normal(glm::vec3 cutpoint) const;
 
-		//void translate(glm::vec3 const& tvector);
+		
 
 };
 

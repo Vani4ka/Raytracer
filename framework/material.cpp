@@ -18,32 +18,32 @@ ks_(ks),
 m_(m)
 {}
 
-std::string Material::name()
+std::string Material::name() const
 {
 	return name_;
 }
 
-Color Material::ka() const&
+Color Material::ka() const
 {
 	return ka_;
 }
 
-Color Material::kd() const&
+Color Material::kd() const
 {
 	return kd_;
 }
 
-Color Material::ks() const&
+Color Material::ks() const
 {
 	return ks_;
 }
 
-float Material::m()
+float Material::m() const
 {
 	return m_;
 }
 
-std::ostream& Material::print(std::ostream& os)
+std::ostream& Material::print(std::ostream& os) const
 {
 	os<<"Das Material "<<name()<<" hat die Koeffizienten fuer ambiente "<<ka()<<", diffuse "<<kd()<<" und spiegelnde "<<ks()<<" Reflektion."<<std::endl
 	  <<"Der Exponent m der Reflektion betraegt "<<m()<<std::endl;

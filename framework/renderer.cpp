@@ -32,7 +32,6 @@ void Renderer::render()
   sdfloader sdf;
   Camera camera;
   sdf.load();
-  float temp;
   
   float widthInv = 1.0f / float(width_);
   float heightInv = 1.0f / float(height_);
@@ -48,28 +47,18 @@ void Renderer::render()
 
       Ray ray=camera.getRay(screenX,screenY);
 
-      //Sphere
 
-      if (sdf.spheres().begin() != sdf.spheres().end())
+      if (sdf.shapes().begin() != sdf.shapes().end())
       {
-        std::vector<Sphere>::iterator iSphere=sdf.spheres().begin();
-      
-        while(iSphere != sdf.spheres().end())
+        for (auto const& shape : sdf.shapes())
         {
-          
-          //std::cerr<<"Section 2"<<std::endl;
+          auto temp=shape->intersect(ray);
 
-          temp=(*iSphere).intersect(ray);
-
-          //std::cerr<<"Section 3"<<std::endl;
-
-          if (temp!= -1)
+          if (temp.hit)
           {
             if (!sdf.lights().empty())
             {
-             // std::cerr<<"Renderer 4"<<std::endl;
-              p.color=raytrace((*iSphere), sdf.lights().front(), sdf, ray);
-              //std::cerr<<"Renderer 5"<<std::endl;
+              p.color=raytrace(shape, sdf.lights().front(), sdf, ray);
             }
             else 
             {
@@ -79,47 +68,15 @@ void Renderer::render()
               }
             }
           }
-          //std::cerr<<"Section 5"<<std::endl;
-          iSphere++;
-          //std::cerr<<"Section 6"<<std::endl;
         }
       }
       else
       {
         if ((x==0) && (y==0))
         {
-          std::cout << "<Sphere> is empty" << std::endl;
+          std::cout << "<Shapes> is empty" << std::endl;
         }
       }
-
-      //Box
-      
-     /* if (sdf.bx().begin() != sdf.boxes().end())
-      {
-        std::vector<Box>::iterator iBox=sdf.boxes().begin();
-      
-        while(iBox != sdf.boxes().end())
-        {
-          auto box=*iBox;
-          
-
-          temp=box.intersect(ray);
-
-          if (temp!= -1)
-          {
-
-            p.color=raytrace(box, sdf.lights().front(), sdf, ray);
-          }
-          ++iBox;
-        }
-      }
-      else
-      {
-        if ((x==0) && (y==0))
-        {
-          std::cout << "<Box> is empty" << std::endl;
-        }
-      }*/  
       
       write(p);
     }
@@ -143,18 +100,12 @@ void Renderer::write(Pixel const& p)
   ppm_.write(p);
 }
 
-template <typename T>
-Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sdf, Ray const& ray) const&
+Color Renderer::raytrace(std::shared_ptr<Shape> const shape, Light const& light, sdfloader const& sdf, Ray const& ray) const
 {
     Color final{0, 0, 0};
-    //std::cerr<<"Raytrace 1"<<std::endl;
-    for (auto i=sdf.materials().begin(); i!=sdf.materials().end(); ++i)
+    for (auto const& mat : sdf.materials())
     { 
-      /*std::cerr<<"Shape: "<<shape.name()<<std::endl;
-      std::cerr<<"Mat-Name: "<<shape.materialname()<<std::endl;
-      std::cerr<<"iter-name: "<<(*i).name()<<std::endl;
-      std::cerr<<"Raytrace 2"<<std::endl;*/
-      if (shape.materialname()==(*i).name())
+      if (shape->materialname()==mat.name())
       {
         //std::cerr<<"Raytrace 3"<<std::endl;
         Color ambient{0, 0, 0};
@@ -163,14 +114,14 @@ Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sd
         Color shadowfactor{1, 1, 1};
         Color ownshadow{1,1,1};
         
-        ambient = (*i).ka() + light.ambient(); //Ambientes Licht
+        ambient = mat.ka() + light.ambient(); //Ambientes Licht
       
-        float invmodulus= 1 / (modulus(shape.normal(shape.intersectPoint(ray))) * modulus(-(shape.intersectPoint(ray)-light.position())));   //Diffuses Licht
-        float diffusefactor= glm::dot(shape.normal(shape.intersectPoint(ray)), -(shape.intersectPoint(ray) -light.position())) * invmodulus;
+        float invmodulus= 1 / (modulus(shape->normal(shape->intersectPoint(ray))) * modulus(-(shape->intersectPoint(ray)-light.position())));   //Diffuses Licht
+        float diffusefactor= glm::dot(shape->normal(shape->intersectPoint(ray)), -(shape->intersectPoint(ray) -light.position())) * invmodulus;
 
         if (diffusefactor > 0) 
         {
-          diffuse=light.diffuse()*diffusefactor*(*i).kd();
+          diffuse=light.diffuse()*diffusefactor*mat.kd();
         }
         else 
         {
@@ -179,29 +130,30 @@ Color Renderer::raytrace(T const& shape, Light const& light, sdfloader const& sd
         }
         
         
-        auto n=shape.normal(shape.intersectPoint(ray)); //Spekulares Licht
-        auto I= - (shape.intersectPoint(ray) - light.position());
+        auto n=shape->normal(shape->intersectPoint(ray)); //Spekulares Licht
+        auto I= - (shape->intersectPoint(ray) - light.position());
         auto nscalarI= glm::dot(n, I);
         auto r= (2 * nscalarI * n) - I;
-        auto v= shape.intersectPoint(ray) - light.position();
+        auto v= shape->intersectPoint(ray) - light.position();
         auto rnormal= r / modulus(r);
         auto vnormal= v / modulus(v);
-        auto cosbexpo= std::pow(glm::dot(rnormal, vnormal), (*i).m());
-        reflection = light.diffuse() * (*i).ks() * cosbexpo;
+        auto cosbexpo= std::pow(glm::dot(rnormal, vnormal), mat.m());
+        reflection = light.diffuse() * mat.ks() * cosbexpo;
 
 
-        Ray shadow(shape.intersectPoint(ray), glm::normalize(light.position() - shape.intersectPoint(ray))); //Schatten
+        Ray shadow(shape->intersectPoint(ray), glm::normalize(light.position() - shape->intersectPoint(ray))); //Schatten
 
-        auto vec = sdf.spheres();
+        auto vec = sdf.shapes();
         
         for (int j=0; j != vec.size(); ++j)
         {
-          if(vec[j].name() == shape.name())
-          {
-            auto temp=vec[j+1].intersect(shadow);
+          if(vec[j]->name() == shape->name())
+            continue;
+          else {          
+            auto temp=vec[j]->intersect(shadow);
             
             //std::cout<<temp<<std::endl;
-            if (temp != -1) 
+            if (temp.hit == true) 
             {
               final= ambient;
               final = final * Color(0.3, 0.3, 0.3);

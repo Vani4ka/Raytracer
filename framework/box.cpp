@@ -1,20 +1,14 @@
 #include "box.hpp"
-#include <glm/glm.hpp>
-#include <math.h>
-#include <iostream>
+
 
 Box::Box():
-name_("empty"),
 p1_((0.0f,0.0f,0.0f)),
 p2_((0.0f,0.0f,0.0f)),
-normal_(0,0,0),
-materialname_("empty")
+normal_(0,0,0)
 {}
 
-Box::Box(std::string name, glm::vec3 p1, glm::vec3 p2, std::string materialname):
-name_(name),
-normal_((0,0,0)),
-materialname_(materialname)
+Box::Box(glm::vec3 p1, glm::vec3 p2):
+normal_((0,0,0))
 {
 	if(p1.x<p2.x){
 		std::swap(p1.x, p2.x);
@@ -30,11 +24,6 @@ materialname_(materialname)
 	// p2=p2-p1;
 }
 
-std::string Box::name() const
-{
-	return name_;
-}
-
 glm::vec3 Box::p1()
 {
 	return p1_;
@@ -45,19 +34,16 @@ glm::vec3 Box::p2()
 	return p2_;
 }
 
-std::string Box::materialname() const
-{
-	return materialname_;
-}
-
 glm::vec3 Box::intersectPoint(Ray const& ra) const
 {
-	return ra.origin_+intersect(ra)*ra.direction_;
+	auto temp=intersect(ra);
+	return ra.origin_+temp.t*ra.direction_;
 }
 
-float Box::intersect(Ray const& r) const
+Hit Box::intersect(Ray const& r) const
 {
-	bool hit= false; 
+	bool hit= false;
+	Hit h; 
 
 	glm::vec3 pz1;
 
@@ -177,12 +163,16 @@ if(t2>=0){
 }
 	if (hit==true)
 	{
-		return t1;
+		h.t=t1;
+		h.hit=true;
+		return h;
 	}
 
 	else 
 	{
-		return -1;
+		h.t=-1;
+		h.hit=false;
+		return h;
 	}
 }	
 

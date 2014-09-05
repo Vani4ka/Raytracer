@@ -16,13 +16,15 @@
 #include "sdfloader.hpp"
 #include "ray.hpp"
 #include "camera.hpp"
-#include "box.hpp"
 #include "light.hpp"
-#include "sphere.hpp"
+#include "hit.hpp"
+#include "shape.hpp"
 #include <math.h>
 #include <string>
 #include <glm/glm.hpp>
-#include <vector> 
+#include <vector>
+#include <memory>
+
 
 class Renderer
 {
@@ -32,9 +34,28 @@ public:
   void render();
   void write(Pixel const& p);
   
-  template<typename T>
-  Color raytrace(T const& shape, Light const& light, sdfloader const& sdf, Ray const& r) const&;
-  
+  Color raytrace(std::shared_ptr<Shape> const shape, Light const& light, sdfloader const& sdf, Ray const& r) const;
+  Hit trace(sdfloader const& sdf, Ray const& ray) {
+    Hit h;
+#if 0
+    for (auto const& shape : sdf.shapes()) {
+      float t = shape->intersect(ray);
+      if (0.0f < t && t < h.t) {
+          h.t = t;
+          h.shape = shape.get();
+          h.hit = true;
+      }
+    }
+#endif
+    return h;
+  }
+  Color shade(sdfloader const& sdf, Ray const& r, unsigned int depth) {
+    if (depth == 0) {
+      return Color(0,0,0);
+    } else {
+
+    }
+  }
   float modulus(glm::vec3 v) const;
 
   inline std::vector<Color> const& colorbuffer() const

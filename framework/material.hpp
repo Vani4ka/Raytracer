@@ -13,12 +13,12 @@ class Material
 	public:
 		Material();
 		Material(std::string name, Color const& ka, Color const& kd, Color const& ks, float m);
-		std::string name();
-		Color ka() const&;
-		Color kd() const&;
-		Color ks() const&;
-		float m();
-		std::ostream& print(std::ostream& os);
+		std::string name() const;
+		Color ka() const;
+		Color kd() const;
+		Color ks() const;
+		float m() const;
+		std::ostream& print(std::ostream& os) const;
 
 };
 

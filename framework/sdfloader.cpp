@@ -1,23 +1,18 @@
 #include "sdfloader.hpp"
 
-std::vector<Material> sdfloader::materials() const
+std::vector<Material> const& sdfloader::materials() const
 {
 	return materials_;
 }
 
-std::vector<Sphere> sdfloader::spheres() const
-{
-	return spheres_;
-}
-
-std::vector<Box> sdfloader::boxes() const
-{
-	return boxes_;
-}
-
-std::vector<Light> sdfloader::lights() const
+std::vector<Light> const& sdfloader::lights() const
 {
 	return lights_;
+}
+
+std::vector<std::shared_ptr<Shape>> const& sdfloader::shapes() const
+{
+	return shapes_;
 }
 
 template<typename T>
@@ -134,17 +129,18 @@ void sdfloader::load()
 
 			    std::cout << "reading sphere: " << input[3] << std::endl;
 			
-			Sphere sp={ input[3],
-						{std::stof(input[4]), std::stof(input[5]), std::stof(input[6])},
-						std::stof(input[7]),
-						input[8]};
+			Shape sphere={ input[3], 														//Name
+						   input[8], 														//Materialname 
+						   {std::stof(input[4]), std::stof(input[5]), std::stof(input[6])}, //Center
+						    std::stof(input[7])};											//Radius
 
-			spheres_.push_back(sp);
+			
+			shapes_.push_back(std::make_shared<Shape>(sphere));
 
-			std::cout<<"Vector-Size Spheres: "<<spheres_.size()<<std::endl;
+			std::cout<<"Vector-Size Shapes: "<<shapes_.size()<<std::endl;
 			}
 
-			if (temp.find("box")!=std::string::npos)
+			/*if (temp.find("box")!=std::string::npos)
 			{
 				std::string input[11];
 				size_t pos=0;
@@ -159,13 +155,14 @@ void sdfloader::load()
 				std::cout << "reading box: " << std::endl;
 
 			
-			Box b={ input[3],
-				   {std::stof(input[4]), std::stof(input[5]), std::stof(input[6])},
-				   {std::stof(input[7]), std::stof(input[8]), std::stof(input[9])},
-					input[10]};
+			Shape box={ input[3],															//Name
+						input[10],															//Materialname
+				   		{std::stof(input[4]), std::stof(input[5]), std::stof(input[6])},	//Punkt 1
+				   		{std::stof(input[7]), std::stof(input[8]), std::stof(input[9])}};	//Punkt 2
 
-			boxes_.push_back(b);
-			}
+			shapes_.push_back(std::make_shared<Shape>(box));
+			std::cout<<"Vector-Size Shapes: "<<shapes_.size()<<std::endl;
+			}*/
 
 		}
 
@@ -205,7 +202,7 @@ void sdfloader::load()
 		
 	}
 
-	spheres_=vectorsort(spheres_);
+	//spheres_=vectorsort(spheres_);
 }
 
 

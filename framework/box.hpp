@@ -2,24 +2,25 @@
 #define BOX_HPP
 #include <glm/glm.hpp>
 #include <string>
+#include <math.h>
+#include <iostream>
 #include "ray.hpp"
+#include "shape.hpp"
+#include "hit.hpp"
 
-class Box
+
+class Box : Shape
 {
 	private: 
-		std::string name_;
 		glm::vec3 p1_;
 		glm::vec3 p2_;
 		glm::vec3 normal_;
-		std::string materialname_;
 	public:
 		Box();
-		Box(std::string name, glm::vec3 p1, glm::vec3 p2, std::string materialname);
-		std::string name() const;
+		Box(glm::vec3 p1, glm::vec3 p2);
 		glm::vec3 p1();
 		glm::vec3 p2();
-		std::string materialname() const;
-		float intersect(Ray const& ra) const;
+		Hit intersect(Ray const& ra) const;
 		glm::vec3 intersectPoint(Ray const& ra) const;
 		glm::vec3 normal(glm::vec3 cutpoint) const;
 
