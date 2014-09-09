@@ -62,147 +62,219 @@ void sdfloader::load()
 		getline(file, temp);
 		std::cout << "reading line of file " << filename << std::endl; //<<temp <<std::endl;
 		
-		if (temp.find("define material")!=std::string::npos) //Material
+		if (temp.find("#")==std::string::npos)
 		{
-			std::string input[13];
-			size_t pos=0;
-			int i=0;
-			while((pos=temp.find(' ')) != std::string::npos)
+
+			if (temp.find("define material")!=std::string::npos) //Material
 			{
-				input[i]=temp.substr(0, pos);
-				temp.erase(0, pos + 1);
-				++i;
-			}
-			std::cout << "reading material: " << input[2] << std::endl;
-			
-			Material mater={input[2],
-				            {std::stof(input[3]), std::stof(input[4]), std::stof(input[5])}, 
-				        	{std::stof(input[6]), std::stof(input[7]), std::stof(input[8])},
-				            {std::stof(input[9]), std::stof(input[10]), std::stof(input[11])},
-				        	std::stof(input[12])};
-			
-			materials_.push_back(mater);
-			//std::cout<<mats_[j].name()<<std::endl;
-			std::cout<<"Vector-Size Material: "<<materials_.size()<<std::endl;
-			//++j;
-
-		}
-
-		if (temp.find("define light")!=std::string::npos)
-		{
-			std::string input[12];
-			size_t pos=0;
-			int i=0;
-			while((pos=temp.find(' ')) != std::string::npos)
-			{
-				input[i]=temp.substr(0, pos);
-				temp.erase(0, pos + 1);
-				++i;
-			}
-
-			std::cout << "reading light: " << input[2] << std::endl;
-			Light light={input[2],
-				        {std::stof(input[3]), std::stof(input[4]), std::stof(input[5])}, 
-				        {std::stof(input[6]), std::stof(input[7]), std::stof(input[8])},
-				        {std::stof(input[9]), std::stof(input[10]), std::stof(input[11])}};
-			
-			lights_.push_back(light); 
-
-			std::cout<<"Vector-Size Light: "<<lights_.size()<<std::endl;
-		}
-
-
-
-		if (temp.find("define shape")!=std::string::npos)
-		{
-			if (temp.find("sphere")!=std::string::npos)
-			{
-				std::string input[9];
+				std::string input[13];
 				size_t pos=0;
 				int i=0;
 				while((pos=temp.find(' ')) != std::string::npos)
 				{
-					input[i]=temp.substr(0,pos);
+					input[i]=temp.substr(0, pos);
 					temp.erase(0, pos + 1);
 					++i;
 				}
+				std::cout << "reading material: " << input[2] << std::endl;
+				
+				Material mater={input[2],
+					            {std::stof(input[3]), std::stof(input[4]), std::stof(input[5])}, 
+					        	{std::stof(input[6]), std::stof(input[7]), std::stof(input[8])},
+					            {std::stof(input[9]), std::stof(input[10]), std::stof(input[11])},
+					        	std::stof(input[12])};
+				
+				materials_.push_back(mater);
+				//std::cout<<mats_[j].name()<<std::endl;
+				std::cout<<"Vector-Size Material: "<<materials_.size()<<std::endl;
+				//++j;
 
-			    std::cout << "reading sphere: " << input[3] << std::endl;
-			
-			Shape sphere={ input[3], 														//Name
-						   input[8], 														//Materialname 
-						   {std::stof(input[4]), std::stof(input[5]), std::stof(input[6])}, //Center
-						    std::stof(input[7])};											//Radius
-
-			
-			shapes_.push_back(std::make_shared<Shape>(sphere));
-
-			std::cout<<"Vector-Size Shapes: "<<shapes_.size()<<std::endl;
 			}
 
-			/*if (temp.find("box")!=std::string::npos)
+			if (temp.find("define light")!=std::string::npos)
 			{
-				std::string input[11];
+				std::string input[12];
 				size_t pos=0;
 				int i=0;
 				while((pos=temp.find(' ')) != std::string::npos)
 				{
-					input[i]=temp.substr(0,pos);
+					input[i]=temp.substr(0, pos);
 					temp.erase(0, pos + 1);
 					++i;
 				}
 
-				std::cout << "reading box: " << std::endl;
+				std::cout << "reading light: " << input[2] << std::endl;
+				Light light={input[2],
+					        {std::stof(input[3]), std::stof(input[4]), std::stof(input[5])}, 
+					        {std::stof(input[6]), std::stof(input[7]), std::stof(input[8])},
+					        {std::stof(input[9]), std::stof(input[10]), std::stof(input[11])}};
+				
+				lights_.push_back(light); 
 
-			
-			Shape box={ input[3],															//Name
-						input[10],															//Materialname
-				   		{std::stof(input[4]), std::stof(input[5]), std::stof(input[6])},	//Punkt 1
-				   		{std::stof(input[7]), std::stof(input[8]), std::stof(input[9])}};	//Punkt 2
+				std::cout<<"Vector-Size Light: "<<lights_.size()<<std::endl;
+			}
 
-			shapes_.push_back(std::make_shared<Shape>(box));
-			std::cout<<"Vector-Size Shapes: "<<shapes_.size()<<std::endl;
-			}*/
 
-		}
 
-		/*if (temp.find("transform")!= std::string::npos)
-		{
-			if (temp.find("translate")!=std::string::npos)
+			if (temp.find("define shape")!=std::string::npos)
 			{
-				std::string input[6];
-				size_t pos=0;
-				int i=0;
-				while((pos=temp.find(' ')) != std::string::npos)
+				if (temp.find("sphere")!=std::string::npos)
 				{
-					input[i]=temp.substr(0,pos);
-					temp.erase(0, pos + 1);
-					++i;
-				}
-
-				std::cout << "reading transformation: " << input[2] << " of " << input[1] << std::endl;
-
-				/*for (i=0; i < sphs_.size(); ++i)
-				{
-					if (spheres_[i].name()==input[1])
+					std::string input[9];
+					size_t pos=0;
+					int i=0;
+					while((pos=temp.find(' ')) != std::string::npos)
 					{
-						glm::vec3 tVector ={std::stof(input[3]), std::stof(input[4]), std::stof(input[5])};
-						spheres_[i].translate(tVector);
+						input[i]=temp.substr(0,pos);
+						temp.erase(0, pos + 1);
+						++i;
+					}
+
+				    std::cout << "reading sphere: " << input[3] << std::endl;
+				
+				Sphere sphere={ input[3], 														//Name
+							   input[8], 														//Materialname 
+							   {std::stof(input[4]), std::stof(input[5]), std::stof(input[6])}, //Center
+							    std::stof(input[7])};											//Radius
+
+				
+				shapes_.push_back(std::make_shared<Sphere>(sphere));
+
+				std::cout<<"Vector-Size Shapes: "<<shapes_.size()<<std::endl;
+				}
+
+				if (temp.find("box")!=std::string::npos)
+				{
+					std::string input[11];
+					size_t pos=0;
+					int i=0;
+					while((pos=temp.find(' ')) != std::string::npos)
+					{
+						input[i]=temp.substr(0,pos);
+						temp.erase(0, pos + 1);
+						++i;
+					}
+
+					std::cout << "reading box: " << std::endl;
+
+				
+				Box box={ input[3],																//Name
+						  input[10],															//Materialname
+					   		{std::stof(input[4]), std::stof(input[5]), std::stof(input[6])},	//Punkt 1
+					   		{std::stof(input[7]), std::stof(input[8]), std::stof(input[9])}};	//Punkt 2
+
+				shapes_.push_back(std::make_shared<Box>(box));
+				std::cout<<"Vector-Size Shapes: "<<shapes_.size()<<std::endl;
+				}
+
+			}
+
+			if (temp.find("transform")!= std::string::npos)
+			{
+				if (temp.find("translate")!=std::string::npos)
+				{
+					std::string input[6];
+					size_t pos=0;
+					int i=0;
+					while((pos=temp.find(' ')) != std::string::npos)
+					{
+						input[i]=temp.substr(0,pos);
+						temp.erase(0, pos + 1);
+						++i;
+					}
+
+					std::cout << "reading transformation: " << input[2] << " of " << input[1] << std::endl;
+
+					for (auto const& i : shapes_)
+					{
+						if ( i-> name() == input[1]  )
+						{
+							i->setTransformed();
+								
+								i->translate({std::stof(input[3]),
+											  std::stof(input[4]),
+											  std::stof(input[5])});
+							
+
+						}
+					}
+
+
+				}
+
+				if (temp.find("scale")!=std::string::npos)
+				{
+					std::string input[6];
+					size_t pos=0;
+					int i=0;
+					while((pos=temp.find(' ')) != std::string::npos)
+					{
+						input[i]=temp.substr(0,pos);
+						temp.erase(0, pos + 1);
+						++i;
+					}
+
+					std::cout << "reading transformation: " << input[2] << " of " << input[1] << std::endl;
+
+
+					for (auto const& i : shapes_)
+					{
+						if ( i-> name() == input[1]  )
+						{
+							i->setTransformed();
+								
+								i->scale({std::stof(input[3]),
+										  std::stof(input[4]),
+									      std::stof(input[5])});
+							
+
+						}
+						std::cout<< i-> name() <<" | " << i -> isTransformed() << std::endl;
 					}
 				}
-			}
 
-		}*/
-		
-		if (temp.find("end")!=std::string::npos)
-		{
-			std::cout << "finished reading file " << filename << std::endl;
-			file.close();
+				if (temp.find("rotate")!=std::string::npos)
+				{
+					std::string input[7];
+					size_t pos=0;
+					int i=0;
+					while((pos=temp.find(' ')) != std::string::npos)
+					{
+						input[i]=temp.substr(0,pos);
+						temp.erase(0, pos + 1);
+						++i;
+					}
+
+					std::cout << "reading transformation: " << input[2] << " of " << input[1] << std::endl;
+
+
+					for (auto const& i : shapes_)
+					{
+						if ( i-> name() == input[1]  )
+						{
+							i->setTransformed();
+								
+								i->rotate(std::stof(input[3]),
+										 {std::stof(input[4]),
+										  std::stof(input[5]),
+									      std::stof(input[6])});
+							
+
+						}
+						std::cout<< i-> name() <<" | " << i -> isTransformed() << std::endl;
+					}
+				}
+
+			}
+			
+			if (temp.find("end")!=std::string::npos)
+			{
+				std::cout << "finished reading file " << filename << std::endl;
+				file.close();
+			}
 		}
 		
 	}
-
-	//spheres_=vectorsort(spheres_);
 }
 
 

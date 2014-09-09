@@ -35,20 +35,7 @@ public:
   void write(Pixel const& p);
   
   Color raytrace(std::shared_ptr<Shape> const shape, Light const& light, sdfloader const& sdf, Ray const& r) const;
-  Hit trace(sdfloader const& sdf, Ray const& ray) {
-    Hit h;
-#if 0
-    for (auto const& shape : sdf.shapes()) {
-      float t = shape->intersect(ray);
-      if (0.0f < t && t < h.t) {
-          h.t = t;
-          h.shape = shape.get();
-          h.hit = true;
-      }
-    }
-#endif
-    return h;
-  }
+  Hit trace(sdfloader const& sdf, Ray const& ray);
   Color shade(sdfloader const& sdf, Ray const& r, unsigned int depth) {
     if (depth == 0) {
       return Color(0,0,0);

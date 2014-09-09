@@ -25,9 +25,41 @@ float Renderer::modulus(glm::vec3 v) const
     return sqrt(asquare + bsquare + csquare);
 }
 
+Hit Renderer::trace(sdfloader const& sdf, Ray const& ray)
+{
+  Hit final;
+  auto ray_untransformed = ray;
+  for (auto const& shape: sdf.shapes())
+  {
+    //std::cout<<shape -> name() << " | "<<shape -> isTransformed() << std::endl;
+    
+    if (shape->isTransformed())
+    {
+      auto origin = glm::vec3(shape -> transformMatrixInv() * glm::vec4(ray.origin_, 1));
+      auto direction = glm::vec3(shape -> transformMatrixInv() * glm::vec4(ray.direction_, 0));
+      ray = Ray(origin, direction); 
+      //std::cout<< shape -> name() <<std::endl;
+    }
+    else 
+    {
+      ray = ray_untransformed;
+    }
+
+
+    auto temp=shape->intersect(ray);
+    if (temp.hit == true && temp.t < final.t)
+    {
+      final.t=temp.t;
+      final.hit=true;
+      final.shape=shape;
+      final.hitray=ray;
+    }
+  }
+  return final;
+}
+
 void Renderer::render()
 {
-  //std::cerr<<"Section 1"<<std::endl;
   const std::size_t checkersize = 20;
   sdfloader sdf;
   Camera camera;
@@ -46,39 +78,17 @@ void Renderer::render()
       float screenY = float(y) * heightInv - 0.5;
 
       Ray ray=camera.getRay(screenX,screenY);
-
-
-      if (sdf.shapes().begin() != sdf.shapes().end())
+      for (auto const& light : sdf.lights())
       {
-        for (auto const& shape : sdf.shapes())
-        {
-          auto temp=shape->intersect(ray);
-
-          if (temp.hit)
-          {
-            if (!sdf.lights().empty())
-            {
-              p.color=raytrace(shape, sdf.lights().front(), sdf, ray);
-            }
-            else 
-            {
-              if ((x==0)&&(y==0))
-              {  
-                std::cout<<"No light found"<<std::endl;
-              }
-            }
-          }
-        }
-      }
-      else
+      
+      auto h=trace(sdf, ray);
+      if(h.hit)
       {
-        if ((x==0) && (y==0))
-        {
-          std::cout << "<Shapes> is empty" << std::endl;
-        }
+        p.color=raytrace(h.shape, light, sdf, h.hitray);
       }
       
       write(p);
+      }
     }
   }
   ppm_.save(filename_);
@@ -115,9 +125,11 @@ Color Renderer::raytrace(std::shared_ptr<Shape> const shape, Light const& light,
         Color ownshadow{1,1,1};
         
         ambient = mat.ka() + light.ambient(); //Ambientes Licht
+
+        final = ambient;
       
-        float invmodulus= 1 / (modulus(shape->normal(shape->intersectPoint(ray))) * modulus(-(shape->intersectPoint(ray)-light.position())));   //Diffuses Licht
-        float diffusefactor= glm::dot(shape->normal(shape->intersectPoint(ray)), -(shape->intersectPoint(ray) -light.position())) * invmodulus;
+        float invmodulus= 1 / (modulus(shape->normal(shape->intersectPoint(ray), shape)) * modulus(-(shape->intersectPoint(ray)-light.position())));   //Diffuses Licht
+        float diffusefactor= glm::dot(shape->normal(shape->intersectPoint(ray), shape), -(shape->intersectPoint(ray) -light.position())) * invmodulus;
 
         if (diffusefactor > 0) 
         {
@@ -130,7 +142,7 @@ Color Renderer::raytrace(std::shared_ptr<Shape> const shape, Light const& light,
         }
         
         
-        auto n=shape->normal(shape->intersectPoint(ray)); //Spekulares Licht
+        auto n=shape->normal(shape->intersectPoint(ray), shape); //Spekulares Licht
         auto I= - (shape->intersectPoint(ray) - light.position());
         auto nscalarI= glm::dot(n, I);
         auto r= (2 * nscalarI * n) - I;
@@ -140,34 +152,25 @@ Color Renderer::raytrace(std::shared_ptr<Shape> const shape, Light const& light,
         auto cosbexpo= std::pow(glm::dot(rnormal, vnormal), mat.m());
         reflection = light.diffuse() * mat.ks() * cosbexpo;
 
-
         Ray shadow(shape->intersectPoint(ray), glm::normalize(light.position() - shape->intersectPoint(ray))); //Schatten
-
-        auto vec = sdf.shapes();
-        
-        for (int j=0; j != vec.size(); ++j)
+        //std::cout<<shape->name()<<std::endl;
+        for (auto const& s1 : sdf.shapes())
         {
-          if(vec[j]->name() == shape->name())
-            continue;
-          else {          
-            auto temp=vec[j]->intersect(shadow);
-            
-            //std::cout<<temp<<std::endl;
-            if (temp.hit == true) 
+            if(s1->name() != shape->name())
             {
-              final= ambient;
-              final = final * Color(0.3, 0.3, 0.3);
+              auto temp= s1->intersect(shadow);
+              if (temp.t > 0 && temp.hit==true)
+              {
+                final = final * Color(0.3, 0.3, 0.3);
+              }
+              else 
+              {
+                final= (ambient * ownshadow) + shadowfactor * (diffuse + reflection);
+              }
             }
-            else 
-            {
-              final= (ambient * ownshadow) + shadowfactor * (diffuse + reflection);
-            }
-          }
         }
-      }
-      else 
-      {
-        //std::cout<<"cant find Material "<<std::endl;
+        //final= (ambient * ownshadow) + shadowfactor * (diffuse + reflection);
+              
       }
     }
   return final;

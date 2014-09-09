@@ -13,12 +13,9 @@ radius_(radius)
 
 Sphere::Sphere(std::string name, std::string materialname, glm::vec3 center, float radius):
 center_(center),
-radius_(radius)
-//name_(name),
-//materialname_(materialname)
-{
-	Shape(name, materialname);
-}
+radius_(radius),
+Shape(name, materialname)
+{}
 
 float Sphere::radius()
 {
@@ -93,16 +90,13 @@ glm::vec3 Sphere::intersectPoint(Ray const& ra) const
 	return ra.origin_+h.t*ra.direction_;
 }
 
-glm::vec3 Sphere::normal(glm::vec3 cutpoint) const
+glm::vec3 Sphere::normal(glm::vec3 cutpoint, std::shared_ptr<Shape> const shape ) const
 {
-	return cutpoint-center_;
+	auto normal= cutpoint-center_;
+	if (shape->isTransformed())
+	{
+		normal=glm::transpose(glm::mat3(shape -> transformMatrixInv())) * normal;
+	}
+
+	return normal;
 }
-
-/*void Sphere::translate(glm::vec3 const& tvector)
-{
-	auto m = glm::translate(glm::mat4(), tvector);
-	auto m_inv= glm::translate(glm::mat4(), -tvector);
-	transformMatrix_=transformMatrix_ * m;
-	transformMatrix_inv_= transformMatrix_inv_ *m_inv;
-
-}*/
