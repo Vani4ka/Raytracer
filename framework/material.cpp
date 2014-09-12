@@ -2,6 +2,8 @@
 #include <string>
 #include <iostream>
 
+//Konstruktoren
+
 Material::Material():
 name_("empty"),
 ka_(Color::Color(0.0f,0.0f,0.0f)),
@@ -17,6 +19,8 @@ kd_(kd),
 ks_(ks),
 m_(m)
 {}
+
+//Getter
 
 std::string Material::name() const
 {

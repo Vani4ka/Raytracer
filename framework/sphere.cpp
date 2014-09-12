@@ -1,5 +1,6 @@
 #include "sphere.hpp"
 
+//Konstruktoren
 
 Sphere::Sphere():
 center_((0.0f,0.0f,0.0f)),
@@ -17,6 +18,8 @@ radius_(radius),
 Shape(name, materialname)
 {}
 
+//Getter
+
 float Sphere::radius()
 {
 	return radius_;
@@ -26,6 +29,8 @@ glm::vec3 Sphere::center()
 {
 	return center_;
 }
+
+//Intersection
 
 Hit Sphere::intersect(Ray const& ra) const
 {
@@ -60,7 +65,7 @@ Hit Sphere::intersect(Ray const& ra) const
 		std::cout<<"Error"<<std::endl;
 	}
 
-	float t1 = (-b + discSqrt) * a2Inv;
+	float t1 = (-b + discSqrt) * a2Inv; //quadratische Gleichung lösen
 	float t2 = (-b - discSqrt) * a2Inv;
 
 	if (t1 > t2) {
@@ -96,7 +101,7 @@ glm::vec3 Sphere::normal(glm::vec3 cutpoint, std::shared_ptr<Shape> const shape 
 	if (shape->isTransformed())
 	{
 		normal=glm::transpose(glm::mat3(shape -> transformMatrixInv())) * normal;
-	}
+	}-
 
 	return normal;
 }

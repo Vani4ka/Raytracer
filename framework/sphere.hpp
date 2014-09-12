@@ -20,10 +20,6 @@ class Sphere : public Shape
 
 	public:
 		Sphere();
-		//Sphere(Sphere const& ) = default;
-		//Sphere(Sphere&&) = default;
-		//~Sphere() = default;
-		//Sphere& operator=(Sphere const& other) = default;
 		Sphere(glm::vec3 center, float radius);
 		Sphere(std::string name, std::string materialname, glm::vec3 center, float radius);
 		
@@ -34,9 +30,6 @@ class Sphere : public Shape
 		Hit intersect(Ray const& ra) const;
 		glm::vec3 intersectPoint(Ray const& ra) const;
 		glm::vec3 normal(glm::vec3 cutpoint, std::shared_ptr<Shape> const shape) const;
-
-		
-
 };
 
 #endif

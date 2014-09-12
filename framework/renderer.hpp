@@ -34,15 +34,9 @@ public:
   void render();
   void write(Pixel const& p);
   
-  Color raytrace(std::shared_ptr<Shape> const shape, Light const& light, sdfloader const& sdf, Ray const& r) const;
+  Color raytrace(std::shared_ptr<Shape> const shape, sdfloader const& sdf, Ray const& r, unsigned int depth) const;
   Hit trace(sdfloader const& sdf, Ray const& ray);
-  Color shade(sdfloader const& sdf, Ray const& r, unsigned int depth) {
-    if (depth == 0) {
-      return Color(0,0,0);
-    } else {
 
-    }
-  }
   float modulus(glm::vec3 v) const;
 
   inline std::vector<Color> const& colorbuffer() const

@@ -17,7 +17,7 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file)
   , ppm_(width_, height_)
 {}
 
-float Renderer::modulus(glm::vec3 v) const
+float Renderer::modulus(glm::vec3 v) const //Betrag eines Vectors
 {
     float asquare=v.x * v.x;
     float bsquare=v.y * v.y;
@@ -25,20 +25,18 @@ float Renderer::modulus(glm::vec3 v) const
     return sqrt(asquare + bsquare + csquare);
 }
 
-Hit Renderer::trace(sdfloader const& sdf, Ray const& ray)
+Hit Renderer::trace(sdfloader const& sdf, Ray const& ray) //Eritteln ob getroffen wird
 {
   Hit final;
   auto ray_untransformed = ray;
   for (auto const& shape: sdf.shapes())
   {
-    //std::cout<<shape -> name() << " | "<<shape -> isTransformed() << std::endl;
     
     if (shape->isTransformed())
     {
       auto origin = glm::vec3(shape -> transformMatrixInv() * glm::vec4(ray.origin_, 1));
       auto direction = glm::vec3(shape -> transformMatrixInv() * glm::vec4(ray.direction_, 0));
       ray = Ray(origin, direction); 
-      //std::cout<< shape -> name() <<std::endl;
     }
     else 
     {
@@ -73,22 +71,21 @@ void Renderer::render()
     for (unsigned x = 0; x < width_; ++x) {
       
       Pixel p(x,y);
-
+      p.color=Color(0, 0, 0);
       float screenX = float(x) * widthInv - 0.5;
       float screenY = float(y) * heightInv - 0.5;
 
       Ray ray=camera.getRay(screenX,screenY);
-      for (auto const& light : sdf.lights())
+      for (auto const& light: sdf.lights())
       {
       
-      auto h=trace(sdf, ray);
-      if(h.hit)
-      {
-        p.color=raytrace(h.shape, light, sdf, h.hitray);
+        auto h=trace(sdf, ray);
+        if(h.hit)
+        {
+          p.color+=raytrace(h.shape, sdf, h.hitray, 5);
+        }
       }
-      
       write(p);
-      }
     }
   }
   ppm_.save(filename_);
@@ -110,24 +107,27 @@ void Renderer::write(Pixel const& p)
   ppm_.write(p);
 }
 
-Color Renderer::raytrace(std::shared_ptr<Shape> const shape, Light const& light, sdfloader const& sdf, Ray const& ray) const
+Color Renderer::raytrace(std::shared_ptr<Shape> const shape, sdfloader const& sdf, Ray const& ray, unsigned int depth) const
 {
     Color final{0, 0, 0};
+    auto light = sdf.lights().front();
+
     for (auto const& mat : sdf.materials())
     { 
       if (shape->materialname()==mat.name())
       {
-        //std::cerr<<"Raytrace 3"<<std::endl;
         Color ambient{0, 0, 0};
         Color diffuse{0, 0, 0};
         Color reflection{0, 0, 0};
         Color shadowfactor{1, 1, 1};
         Color ownshadow{1,1,1};
         
-        ambient = mat.ka() + light.ambient(); //Ambientes Licht
 
+        //Ambienter Anteil des Lichts
+        ambient = mat.ka() + light.ambient(); 
         final = ambient;
-      
+
+        //Diffuser Anteil des Lichts
         float invmodulus= 1 / (modulus(shape->normal(shape->intersectPoint(ray), shape)) * modulus(-(shape->intersectPoint(ray)-light.position())));   //Diffuses Licht
         float diffusefactor= glm::dot(shape->normal(shape->intersectPoint(ray), shape), -(shape->intersectPoint(ray) -light.position())) * invmodulus;
 
@@ -150,16 +150,15 @@ Color Renderer::raytrace(std::shared_ptr<Shape> const shape, Light const& light,
         auto rnormal= r / modulus(r);
         auto vnormal= v / modulus(v);
         auto cosbexpo= std::pow(glm::dot(rnormal, vnormal), mat.m());
-        reflection = light.diffuse() * mat.ks() * cosbexpo;
+        reflection = light.diffuse() * mat.ks() * cosbexpo; 
 
         Ray shadow(shape->intersectPoint(ray), glm::normalize(light.position() - shape->intersectPoint(ray))); //Schatten
-        //std::cout<<shape->name()<<std::endl;
         for (auto const& s1 : sdf.shapes())
         {
             if(s1->name() != shape->name())
             {
               auto temp= s1->intersect(shadow);
-              if (temp.t > 0 && temp.hit==true)
+              if (temp.t > -1 && temp.hit==true)
               {
                 final = final * Color(0.3, 0.3, 0.3);
               }
@@ -169,8 +168,17 @@ Color Renderer::raytrace(std::shared_ptr<Shape> const shape, Light const& light,
               }
             }
         }
-        //final= (ambient * ownshadow) + shadowfactor * (diffuse + reflection);
-              
+
+        /*Ray incident(light.position(), glm::normalize(shape->intersectPoint(ray)- light.position())); // Spiegelung
+
+        auto reflecteddir = //incident.direction_ - 2* glm::dot(incident.direction_, shape->normal(shape->intersectPoint(ray),shape)) * shape-> normal(shape->intersectPoint(ray),shape);
+                            glm::normalize(glm::reflect(incident.direction_,shape->normal(shape->intersectPoint(ray),shape)));
+        Ray reflected(shape->intersectPoint(ray), reflecteddir);
+        auto temp=shape->intersect(reflected);
+        if (temp.hit && depth > 0 && temp.t > 0)
+        {
+          return raytrace(shape, sdf, reflected, --depth) + final;
+        }*/
       }
     }
   return final;

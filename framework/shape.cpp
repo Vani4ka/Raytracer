@@ -1,16 +1,18 @@
 #include "shape.hpp"
 
+//Konstruktoren
+
 Shape::Shape():
 name_("empty"),
 materialname_("empty"),
-transformMatrix_ 	((1, 0, 0, 0,
+transformMatrix_ 	((1, 0, 0, 0,  //Einheitsmatrix
 				  	  0, 1, 0, 0,
 				  	  0, 0, 1, 0,
 				      0, 0, 0, 1)),
-transformMatrixInv_ ((0, 0, 0, 1,
-					  0, 0, 1, 0,
+transformMatrixInv_ ((1, 0, 0, 0,
 					  0, 1, 0, 0,
-					  1, 0, 0, 0 )),
+					  0, 0, 1, 0,
+					  0, 0, 0, 1 )),
 isTransformed_(false)
 {
 	//Sphere::Sphere();
@@ -31,7 +33,9 @@ transformMatrixInv_ ((1, 0, 0, 0,
 isTransformed_(false)
 {}
 
-std::string Shape::name() const
+
+//Getter
+std::string Shape::name() const 
 {
 	return name_;
 }
@@ -61,6 +65,8 @@ void Shape::setTransformed()
 	isTransformed_=true;
 }
 
+//Transfromationen
+
 void Shape::translate(glm::vec3 const& tvector)
 {
 	auto m = glm::translate(glm::mat4(), tvector);
@@ -79,7 +85,7 @@ void Shape::scale(glm::vec3 const& svector)
 
 void Shape::rotate(float deg, glm::vec3 const& axis)
 {
-	float rad=deg * M_PI / 180;
+	float rad=deg * M_PI / 180; //deg to rad
 	auto m = glm::rotate(glm::mat4(), rad, axis);
 	auto m_inv = glm::rotate(glm::mat4(), -rad, axis);
 	transformMatrix_=transformMatrix_ * m;

@@ -14,6 +14,7 @@
 #include "shape.hpp"
 #include "sphere.hpp"
 #include "box.hpp"
+#include "cylinder.hpp"
 
 class sdfloader
 {
@@ -26,9 +27,6 @@ class sdfloader
 		std::vector<std::shared_ptr<Shape>> const& shapes() const;
 		std::vector<Light> const& lights() const;
 		void load();
-
-		template<typename T>
-		std::vector<T> vectorsort(std::vector<T> vec);
 };
 
 #endif

@@ -1,5 +1,7 @@
 #include "sdfloader.hpp"
 
+//Getter
+
 std::vector<Material> const& sdfloader::materials() const
 {
 	return materials_;
@@ -15,54 +17,17 @@ std::vector<std::shared_ptr<Shape>> const& sdfloader::shapes() const
 	return shapes_;
 }
 
-template<typename T>
-std::vector<T> sdfloader::vectorsort(std::vector<T> vec)
-{
-	if (vec.begin() != vec.end())
-	{
-		int j=0;
-		while (j != vec.size())
-		{
-
-			for (int i=0 ; i != vec.size()-1 ; ++i)
-			{
-				std::cout<<"Vector sort"<<std::endl;
-
-				auto z1= vec[i].center().z;
-				auto z2= vec[i+1].center().z;
-
-				auto r1=vec[i].radius();
-				auto r2=vec[i+1].radius(); 
-
-				if ((z1+r1) > (z2+r2))
-				{
-					std::cout<<"Vector swap: "<< (z1+r1) <<", "<< (z2+r2) << std::endl;
-					auto temp=vec[i];
-					vec[i]=vec[i+1];
-					vec[i+1]=temp;
-				}
-			}
-			++j;
-		}
-	}
-	else 
-	{
-		std::cout<<"empty Vector"<<std::endl;
-	}	
-	return vec;
-}
-
 void sdfloader::load()
 {
-	std::string filename("readMat.txt");
+	std::string filename("scene.sdf");
 	std::ifstream file(filename);
 	std::string temp;
 	while(file.is_open())
 	{	
-		getline(file, temp);
-		std::cout << "reading line of file " << filename << std::endl; //<<temp <<std::endl;
+		getline(file, temp); //Lese Zeile vom File
+		std::cout << "reading line of file " << filename << std::endl;
 		
-		if (temp.find("#")==std::string::npos)
+		if (temp.find("#")==std::string::npos) //Kommentarfunktion
 		{
 
 			if (temp.find("define material")!=std::string::npos) //Material
@@ -70,10 +35,10 @@ void sdfloader::load()
 				std::string input[13];
 				size_t pos=0;
 				int i=0;
-				while((pos=temp.find(' ')) != std::string::npos)
+				while((pos=temp.find(' ')) != std::string::npos) //Zerteiln des Strings 
 				{
-					input[i]=temp.substr(0, pos);
-					temp.erase(0, pos + 1);
+					input[i]=temp.substr(0, pos); //Speichern der Stücke im Array
+					temp.erase(0, pos + 1);		  //Löschen des gespeicherten Teils + Leerzeile
 					++i;
 				}
 				std::cout << "reading material: " << input[2] << std::endl;
@@ -85,9 +50,7 @@ void sdfloader::load()
 					        	std::stof(input[12])};
 				
 				materials_.push_back(mater);
-				//std::cout<<mats_[j].name()<<std::endl;
 				std::cout<<"Vector-Size Material: "<<materials_.size()<<std::endl;
-				//++j;
 
 			}
 
@@ -167,6 +130,31 @@ void sdfloader::load()
 				std::cout<<"Vector-Size Shapes: "<<shapes_.size()<<std::endl;
 				}
 
+				if (temp.find("cylinder")!=std::string::npos)
+				{
+					std::string input[10];
+					size_t pos=0;
+					int i=0;
+					while((pos=temp.find(' ')) != std::string::npos)
+					{
+						input[i]=temp.substr(0,pos);
+						temp.erase(0, pos + 1);
+						++i;
+					}
+
+					std::cout << "reading cylinder: " << std::endl;
+
+				
+				Cylinder cylinder={ input[3],															//Name
+						  			input[9],															//Materialname
+					   				{std::stof(input[4]), std::stof(input[5]), std::stof(input[6])},	//Center
+					   				std::stof(input[7]),												//Höhe
+					   				std::stof(input[8])};												//Radius
+
+				shapes_.push_back(std::make_shared<Cylinder>(cylinder));
+				std::cout<<"Vector-Size Shapes: "<<shapes_.size()<<std::endl;
+				}
+
 			}
 
 			if (temp.find("transform")!= std::string::npos)
@@ -189,7 +177,7 @@ void sdfloader::load()
 					{
 						if ( i-> name() == input[1]  )
 						{
-							i->setTransformed();
+							i->setTransformed();	//Objekt i ist transformiert
 								
 								i->translate({std::stof(input[3]),
 											  std::stof(input[4]),
